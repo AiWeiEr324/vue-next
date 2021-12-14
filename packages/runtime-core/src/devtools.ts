@@ -79,6 +79,7 @@ export function setDevtoolsHook(hook: DevtoolsHook, target: any) {
 }
 
 export function devtoolsInitApp(app: App, version: string) {
+  // args: 'app:init'、app、version(版本)、
   emit(DevtoolsHooks.APP_INIT, app, version, {
     Fragment,
     Text,

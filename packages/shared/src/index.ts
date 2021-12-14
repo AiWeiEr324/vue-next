@@ -13,7 +13,7 @@ export * from './escapeHtml'
 export * from './looseEqual'
 export * from './toDisplayString'
 
-export const EMPTY_OBJ: { readonly [key: string]: any } = __DEV__
+export const EMPTY_OBJ: { readonly [key: string | symbol]: any } = __DEV__
   ? Object.freeze({})
   : {}
 export const EMPTY_ARR = __DEV__ ? Object.freeze([]) : []

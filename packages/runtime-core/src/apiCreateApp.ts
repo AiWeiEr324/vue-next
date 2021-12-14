@@ -184,10 +184,10 @@ export function createAppAPI<HostElement>(
       rootProps = null
     }
 
-    const context = createAppContext()
-    const installedPlugins = new Set()
+    const context = createAppContext() // 拿到上下文（初始化）
+    const installedPlugins = new Set() // set 结构的注入依赖变量
 
-    let isMounted = false
+    let isMounted = false // 是否渲染
 
     const app: App = (context.app = {
       _uid: uid++,
@@ -203,6 +203,7 @@ export function createAppAPI<HostElement>(
         return context.config
       },
 
+      // 不可以设置 config
       set config(v) {
         if (__DEV__) {
           warn(
@@ -211,6 +212,8 @@ export function createAppAPI<HostElement>(
         }
       },
 
+      // 注入插件｜依赖
+      // (app: App, ...options: any[]) => {return any}
       use(plugin: Plugin, ...options: any[]) {
         if (installedPlugins.has(plugin)) {
           __DEV__ && warn(`Plugin has already been applied to target app.`)
@@ -221,6 +224,7 @@ export function createAppAPI<HostElement>(
           installedPlugins.add(plugin)
           plugin(app, ...options)
         } else if (__DEV__) {
+          // 如果没有传参数，开发环境会报错
           warn(
             `A plugin must either be a function or an object with an "install" ` +
               `function.`
@@ -245,26 +249,31 @@ export function createAppAPI<HostElement>(
         return app
       },
 
+      // 注册组件｜拿到组件
       component(name: string, component?: Component): any {
         if (__DEV__) {
+          // 校验组件名称
           validateComponentName(name, context.config)
         }
         if (!component) {
+          // 不存在传入的组件，就去已有的组件对象中去找
           return context.components[name]
         }
         if (__DEV__ && context.components[name]) {
           warn(`Component "${name}" has already been registered in target app.`)
         }
-        context.components[name] = component
+        context.components[name] = component // 将组件添加到 context 的 components 中
         return app
       },
 
       directive(name: string, directive?: Directive) {
         if (__DEV__) {
+          // 开发环境中去校验是否是内部指令
           validateDirectiveName(name)
         }
 
         if (!directive) {
+          // 没传指令就去对应指令集中找并返回
           return context.directives[name] as any
         }
         if (__DEV__ && context.directives[name]) {
@@ -274,12 +283,20 @@ export function createAppAPI<HostElement>(
         return app
       },
 
+      /**
+       * 1. 创建虚拟节点
+       * 2. 将 context 挂载到虚拟节点上
+       * 3. 渲染虚拟节点到容器中
+       * 4. 将根容器保存起来
+       * 5. 返回xxx 暂时还不懂
+       */
       mount(
         rootContainer: HostElement,
         isHydrate?: boolean,
         isSVG?: boolean
       ): any {
         if (!isMounted) {
+          // 创建 vnode，传入根组件与根 props
           const vnode = createVNode(
             rootComponent as ConcreteComponent,
             rootProps
@@ -296,6 +313,7 @@ export function createAppAPI<HostElement>(
           }
 
           if (isHydrate && hydrate) {
+            // 自定义的 render
             hydrate(vnode as VNode<Node, Element>, rootContainer as any)
           } else {
             render(vnode, rootContainer, isSVG)
@@ -349,6 +367,7 @@ export function createAppAPI<HostElement>(
       }
     })
 
+    // 兼容处理
     if (__COMPAT__) {
       installAppCompatProperties(app, context, render)
     }

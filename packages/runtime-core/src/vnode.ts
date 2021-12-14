@@ -361,6 +361,7 @@ let vnodeArgsTransformer:
  * It is *internal* but needs to be exposed for test-utils to pick up proper
  * typings
  */
+// 只是为了单元测试
 export function transformVNodeArgs(transformer?: typeof vnodeArgsTransformer) {
   vnodeArgsTransformer = transformer
 }
@@ -390,6 +391,7 @@ const normalizeRef = ({ ref }: VNodeProps): VNodeNormalizedRefAtom | null => {
   ) as any
 }
 
+// type: { router: Router, render: () => h(App) }
 function createBaseVNode(
   type: VNodeTypes | ClassComponent | typeof NULL_DYNAMIC_COMPONENT,
   props: (Data & VNodeProps) | null = null,
@@ -443,6 +445,7 @@ function createBaseVNode(
   }
 
   // validate key
+  // 不能以 NaN 为 key
   if (__DEV__ && vnode.key !== vnode.key) {
     warn(`VNode created with invalid key (NaN). VNode type:`, vnode.type)
   }
@@ -481,6 +484,7 @@ export const createVNode = (
   __DEV__ ? createVNodeWithArgsTransform : _createVNode
 ) as typeof _createVNode
 
+// arg1: { render: () => h(App), router: Router }
 function _createVNode(
   type: VNodeTypes | ClassComponent | typeof NULL_DYNAMIC_COMPONENT,
   props: (Data & VNodeProps) | null = null,
@@ -489,13 +493,15 @@ function _createVNode(
   dynamicProps: string[] | null = null,
   isBlockNode = false
 ): VNode {
+  // type 为 #app
   if (!type || type === NULL_DYNAMIC_COMPONENT) {
     if (__DEV__ && !type) {
       warn(`Invalid vnode type when creating vnode: ${type}.`)
     }
-    type = Comment
+    type = Comment // Symbol(Comment)
   }
 
+  // mounted 不走这里
   if (isVNode(type)) {
     // createVNode receiving an existing vnode. This happens in cases like
     // <component :is="vnode"/>
@@ -507,6 +513,7 @@ function _createVNode(
     return cloned
   }
 
+  // mounted 不走这里
   // class component normalization.
   if (isClassComponent(type)) {
     type = type.__vccOpts

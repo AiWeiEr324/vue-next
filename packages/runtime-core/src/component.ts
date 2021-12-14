@@ -63,7 +63,7 @@ import { convertLegacyRenderFn } from './compat/renderFn'
 import { globalCompatConfig, validateCompatConfig } from './compat/compatConfig'
 import { SchedulerJob } from './scheduler'
 
-export type Data = Record<string, unknown>
+export type Data = Record<string | symbol, unknown>
 
 /**
  * For extending allowed non-declared props on components in TSX
@@ -556,6 +556,7 @@ const isBuiltInTag = /*#__PURE__*/ makeMap('slot,component')
 export function validateComponentName(name: string, config: AppConfig) {
   const appIsNativeTag = config.isNativeTag || NO
   if (isBuiltInTag(name) || appIsNativeTag(name)) {
+    // 如果传入的 name 为 slot 或者 component 会报错
     warn(
       'Do not use built-in or reserved HTML elements as component id: ' + name
     )
@@ -632,6 +633,7 @@ function setupStatefulComponent(
 
     setCurrentInstance(instance)
     pauseTracking()
+    // 将 props 设置给 setup 的 args
     const setupResult = callWithErrorHandling(
       setup,
       instance,

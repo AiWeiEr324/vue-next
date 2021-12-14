@@ -364,6 +364,18 @@ function baseCreateRenderer(
 
   // Note: functions inside this closure should use `const xxx = () => {}`
   // style in order to prevent being inlined by minifiers.
+  /**
+   * @param n1 是否是 mount，null 表示是 mount
+   * @param n2 vnode
+   * @param container 渲染容器
+   * @param anchor
+   * @param parentComponent
+   * @param parentSuspense
+   * @param isSVG
+   * @param slotScopeIds
+   * @param optimized
+   * @returns
+   */
   const patch: PatchFn = (
     n1,
     n2,
@@ -375,6 +387,7 @@ function baseCreateRenderer(
     slotScopeIds = null,
     optimized = __DEV__ && isHmrUpdating ? false : !!n2.dynamicChildren
   ) => {
+    // 如果是已经渲染并且没有任何改变的 vnode 则直接退出
     if (n1 === n2) {
       return
     }
@@ -1217,6 +1230,7 @@ function baseCreateRenderer(
     }
 
     if (__DEV__) {
+      // 添加到 warning stack
       pushWarningContext(initialVNode)
       startMeasure(instance, `mount`)
     }

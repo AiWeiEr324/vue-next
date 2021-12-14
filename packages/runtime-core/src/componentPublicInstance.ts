@@ -256,7 +256,7 @@ const enum AccessTypes {
 }
 
 export interface ComponentRenderContext {
-  [key: string]: any
+  [key: string | symbol]: any
   _: ComponentInternalInstance
 }
 
